@@ -482,6 +482,18 @@ test("parseAddress", () => {
   assert.deepEqual(p("9 Elm Dr, Rossville"), { address_line_1: "9 Elm Dr", city: "Rossville", state: "GA", zip: "" });
   assert.deepEqual(p("9 Elm Dr, Fort Oglethorpe, GA 30742"), { address_line_1: "9 Elm Dr", city: "Fort Oglethorpe", state: "GA", zip: "30742" });
   assert.deepEqual(p("37404"), { address_line_1: "37404", city: "Chattanooga", state: "TN", zip: "" });
+  // Pasted from a map, or typed loosely.
+  const dodds = { address_line_1: "2301 Dodds Ave", city: "Chattanooga", state: "TN", zip: "37407" };
+  assert.deepEqual(p("2301 Dodds Ave, Chattanooga, TN 37407, USA"), dodds);
+  assert.deepEqual(p("2301 Dodds Ave, Chattanooga, TN 37407, United States"), dodds);
+  assert.deepEqual(p("2301 Dodds Ave, Chattanooga, TN 37407."), dodds);
+  assert.deepEqual(p("2301 Dodds Ave, Chattanooga 37407 TN"), dodds);
+  assert.deepEqual(p("2301 Dodds Ave, Chattanooga, Tennessee, 37407"), dodds);
+  // The house number isn't the ZIP; the state comes from the ZIP when it isn't typed.
+  assert.deepEqual(p("10520 Hixson Pike"), { address_line_1: "10520 Hixson Pike", city: "Chattanooga", state: "TN", zip: "" });
+  assert.deepEqual(p("10520 Hixson Pike, Hixson 37343"), { address_line_1: "10520 Hixson Pike", city: "Hixson", state: "TN", zip: "37343" });
+  assert.deepEqual(p("9 Elm Dr, Ringgold 30736"), { address_line_1: "9 Elm Dr", city: "Ringgold", state: "GA", zip: "30736" });
+  assert.deepEqual(p("9 Elm Dr 30741"), { address_line_1: "9 Elm Dr", city: "Chattanooga", state: "GA", zip: "30741" });
 });
 
 test("splitName", () => {

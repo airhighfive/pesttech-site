@@ -359,18 +359,21 @@ const STATES = { tn: "TN", tenn: "TN", tennessee: "TN", ga: "GA", georgia: "GA",
 const GEORGIA_TOWNS = /^(?:rossville|fort oglethorpe|ft\.? oglethorpe|ringgold|chickamauga|flintstone|la ?fayette|trenton|rising fawn)$/i;
 const UNIT = /^(?:apt|apartment|unit|ste|suite|lot|bldg|building|fl|floor|rm|room|#)\b/i;
 
-// The form has one address box; GorillaDesk wants street, city, state and ZIP. Best effort: peel a ZIP and a state
-// off the end, take the last comma-separated part as the city, and fall back to Chattanooga, TN. The address as
-// typed also goes in the note, so nothing is lost when this guesses wrong.
+// The form has one address box; GorillaDesk wants street, city, state and ZIP. Best effort: take the last 5-digit
+// number as the ZIP, peel a state off the end, take the last comma-separated part as the city, and fall back to
+// Chattanooga, TN. The address as typed also goes in the note, so nothing is lost when this guesses wrong.
 export function parseAddress(raw) {
-  let rest = raw;
+  // Addresses pasted from a map often end with the country or a period.
+  const trailing = /[\s,.;]+$/;
+  let rest = raw.replace(/[\s,]*\b(?:usa|u\.s\.(?:a\.)?|us|united states(?: of america)?)\W*$/i, "").replace(trailing, "");
   let zip = "";
   let state = "";
   let city = "Chattanooga";
-  const zipMatch = /[\s,]*\b(\d{5})(?:-\d{4})?$/.exec(rest);
+  // The last 5-digit number, unless it's the house number at the very start ("10520 Hixson Pike").
+  const zipMatch = [...rest.matchAll(/\b(\d{5})(?:-\d{4})?\b/g)].at(-1);
   if (zipMatch && zipMatch.index > 0) {
     zip = zipMatch[1];
-    rest = rest.slice(0, zipMatch.index);
+    rest = (rest.slice(0, zipMatch.index) + rest.slice(zipMatch.index + zipMatch[0].length)).replace(trailing, "");
   }
   const stateMatch = /[\s,]+(tn|tenn|tennessee|ga|georgia|al|ala|alabama)\.?$/i.exec(rest);
   if (stateMatch) {
@@ -380,8 +383,17 @@ export function parseAddress(raw) {
   const parts = rest.split(",").map((part) => part.trim()).filter(Boolean);
   const last = parts.at(-1);
   if (parts.length > 1 && /^[a-z][a-z .'-]*$/i.test(last) && !UNIT.test(last)) city = parts.pop();
-  state ||= GEORGIA_TOWNS.test(city) ? "GA" : "TN";
+  state ||= stateForZip(zip) || (GEORGIA_TOWNS.test(city) ? "GA" : "TN");
   return { address_line_1: parts.join(", ") || raw, city, state, zip };
+}
+
+// ZIP prefixes for the states around Chattanooga.
+function stateForZip(zip) {
+  const prefix = Number(zip.slice(0, 3));
+  if (prefix >= 370 && prefix <= 385) return "TN";
+  if ((prefix >= 300 && prefix <= 319) || prefix === 398 || prefix === 399) return "GA";
+  if (prefix >= 350 && prefix <= 369) return "AL";
+  return "";
 }
 
 // The last word is the last name, keeping a suffix with it ("John Smith Jr." → "John", "Smith Jr.").
