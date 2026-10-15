@@ -195,8 +195,13 @@ async function callGorillaDesk(env, path, { method = "GET", json, body } = {}) {
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) {
-    const detail = typeof data?.message === "string" ? `: ${data.message.slice(0, 200)}` : "";
-    throw new Error(`${method} ${path} returned HTTP ${res.status}${detail}`);
+    // GorillaDesk puts a summary in `message` and, for validation errors, the fields in `error`/`errors`.
+    const fields = data?.error ?? data?.errors;
+    const detail = [typeof data?.message === "string" ? data.message : "", fields ? JSON.stringify(fields) : ""]
+      .filter(Boolean)
+      .join(" ")
+      .slice(0, 300);
+    throw new Error(`${method} ${path} returned HTTP ${res.status}${detail ? `: ${detail}` : ""}`);
   }
   return data;
 }

@@ -304,6 +304,12 @@ test("GorillaDesk rejects the lead: Slack says so, the visitor still gets thanks
   assert.match(slackCalls()[0].json.text, /:warning: Not in GorillaDesk \(POST \/customers returned HTTP 422: The zip field is required\.\)\. Add it by hand\.$/);
 });
 
+test("GorillaDesk's field-level errors make it into the Slack warning", async () => {
+  replies[`POST ${GD}/customers`] = () => json({ message: "Bad request", error: { "location.zip": ["required"] } }, 400);
+  assert.ok(accepted(await post({ address: "123 Main St" })));
+  assert.match(slackCalls()[0].json.text, /HTTP 400: Bad request \{"location\.zip":\["required"\]\}\)\. Add it by hand\./);
+});
+
 test("GorillaDesk unreachable: Slack says so, the visitor still gets thanks", async () => {
   replies[`GET ${GD}/phone-types?limit=100`] = () => { throw new TypeError("fetch failed"); };
   replies[`POST ${GD}/customers`] = () => { throw new TypeError("fetch failed"); };
