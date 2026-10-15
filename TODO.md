@@ -4,7 +4,9 @@ Everything here is either a `[Q]` from the Claude Design files (copy that wasn't
 
 ## Blocking launch
 
-- [ ] **Online Booking add-on (spec Q6).** Confirm the GorillaDesk plan includes it, then set `booking.embedUrl` in `src/_data/site.js`. Until then, /book and every service page show the designed placeholder box.
+- Done 2026-10-15: **Online Booking add-on (spec Q6).** Dan turned it on in GorillaDesk (Addons → Online Booking), with only the two inspections bookable. /book and every service page show GorillaDesk's iframe (`booking.embedUrl` in `src/_data/site.js`) at a fixed 780px. GorillaDesk's optional `embed.js` resizer is left off (no JS outside the /book form), so the list of times scrolls inside the box.
+  - Online bookings arrive as Pending jobs (Reports → Online Booking Report). One whose phone or email doesn't match a customer stays off the calendar until it's assigned to one, so check the report often (for a future SOP).
+  - The widget requires an email address; the request form doesn't ask for one. The time list shows every 15-minute slot from 7:30 to 5:00, with taken ones greyed out.
 - Done 2026-10-15: **booking endpoint (spec step 5).** `/api/request` (`functions/api/request.js`, see "Booking endpoint" in the README) is live on pages.dev, with both secrets and the `RATE_LIMIT` KV binding. Live tests posted to Slack (#new-channel) and created a GorillaDesk customer with status Lead, with its note. GorillaDesk refuses a blank ZIP, so /book has a required ZIP code box.
   - The test lead is deleted. GorillaDesk lead notifications are on for Dan and Shelby. The Slack link opens the lead on the web but not in the mobile app (fine).
   - Web leads arrive with no lead source (the API can't set one). A repeat customer comes in as a new lead; delete or merge it in GorillaDesk (for a future SOP).
@@ -28,7 +30,7 @@ All copy follows `../pest-tech-website-voice-guide.md`. Run its section 11 check
 - [ ] Termites: NPMA-33 letter price. The old site says "usually $160"; it's left off.
 - [ ] Mosquitoes: 2026 In2Care season price. The old site says "$500-1000"; it's left off.
 - [ ] Bed bugs: the old page's "$100 deposit to inspect" sentence is left off (an unpublished price). Also confirm the "90-day warranty" line is still true.
-- [ ] Privacy policy (ported as-is) still mentions an online portal that collects email, and cookies. The new site sets no cookies and the form doesn't ask for email. Worth a refresh.
+- [ ] Privacy policy (ported as-is) still mentions an online portal that collects email, and cookies. The new site sets no cookies and the form doesn't ask for email, but the GorillaDesk booking widget does ask for email. Worth a refresh.
 - Done 2026-10-14: FAQ contracts and response-time answers are Dan's wording; Team shows names and photos only, no titles.
 
 ## Notes for the About and service-page pass (Dan, 2026-10-14)

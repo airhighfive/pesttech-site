@@ -46,8 +46,10 @@ export default {
   logo: { src: "/assets/img/pest-tech-chattanooga-logo.png", width: 600, height: 159 },
 
   booking: {
-    // GorillaDesk Online Booking embed URL. Until it's set, pages show the designed placeholder box (spec Q6).
-    embedUrl: null,
+    // GorillaDesk Online Booking iframe (GorillaDesk → Addons → Online Booking → Show Code, the iframe option).
+    // Its optional embed.js resizer is left off (no JS outside the /book form); see `.booking iframe` in site.css.
+    // Set to null to bring back the designed placeholder box (spec Q6).
+    embedUrl: "https://portal-embed-v3.gorilladesk.com/?screen=booking&account_id=3312",
     // The plain request form posts here: functions/api/request.js, which writes a GorillaDesk lead and pings Slack.
     requestEndpoint: "/api/request",
   },
