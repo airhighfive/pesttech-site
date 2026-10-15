@@ -1,0 +1,13 @@
+---
+title: Request Received
+description: "We got your request. This is a request, not a confirmed appointment yet. We'll text you to confirm a day and time."
+navKey: book
+noindex: true
+permalink: /book/thanks.html
+eleventyExcludeFromCollections: true
+---
+{#- The booking endpoint redirects here after a successful submission. Wording from the voice guide, section 10. #}
+<h1>Got it, thanks.</h1>
+<p class="lede">This is a request, not a confirmed appointment yet. We'll text you to confirm a day and time.</p>
+<p class="center">Need us sooner? Call or text <a class="phone-inline" href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a>.</p>
+<p class="center"><a href="/">← Back to the home page</a></p>

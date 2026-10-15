@@ -1,0 +1,13 @@
+# Cloudflare Pages redirects (spec: redirect map). Every other URL keeps its Squarespace path.
+# The 26 old testimonial pages are consolidated on /reviews.
+/testimonials     /reviews  301
+/testimonials/*   /reviews  301
+# 2021 charity calendar page, archived (spec Q1).
+/calendar         /         301
+# Squarespace's name for the home page; it's in the old sitemap.
+/home             /         301
+# The old blog had one post (ticks, 2020), retired in the rebuild (Dan, 2026-10-15).
+/blog             /         301
+/blog/*           /         301
+# The old site's licensing page lived here (its footer linked to /licensing-insurance, which was a 404).
+/insurance        /licensing-insurance  301

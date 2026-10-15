@@ -1,0 +1,33 @@
+---
+permalink: /llms.txt
+layout: false
+eleventyExcludeFromCollections: true
+---
+# {{ site.name }}
+
+> {{ site.summary }} Call or text {{ site.phone.display }} ({{ site.hours.display }}). Regular Service runs $40 to $50 a month for most homes, with extra visits between treatments at no charge.
+
+## Services
+
+{% for s in services -%}
+- [{{ s.name }}]({{ site.url }}/{{ s.slug }}): {{ s.blurb | safe }}
+{% endfor %}
+## Booking and contact
+
+- [Book a service]({{ site.url }}/book): call or text, schedule online, or send a plain request form (no account, no captcha). A request is not a confirmed appointment; we text to confirm.
+- [Service area]({{ site.url }}/service-area): Chattanooga, a little bit of North Georgia, and the neighborhoods within {{ site.radius }} of downtown.
+- [FAQ]({{ site.url }}/faq): cost, the service agreement, kids and pets, one-time visits, how fast we can come out, termites.
+
+## Licensing
+
+{% for l in site.licenses -%}
+- {{ l.name }}: {{ l.number }}
+{% endfor %}- Termite work is Tennessee only.
+
+## About
+
+- [Reviews]({{ site.url }}/reviews): {{ reviews.length }} customer reviews with neighborhoods.
+- [About]({{ site.url }}/about): who we are and why we're into bugs.
+- [Team]({{ site.url }}/team): the crew.
+- [Jobs]({{ site.url }}/jobs): we hire A-grade attitudes.
+- [Referrals]({{ site.url }}/referrals): refer someone who starts Regular Service and your next invoice is on us. Text us their name; there's no form.

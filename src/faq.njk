@@ -1,0 +1,23 @@
+---
+title: Frequently Asked Questions
+fullTitle: "Pest Control FAQ: Cost, Contracts, Kids and Pets | Pest Tech"
+description: "Answers about Pest Tech: what regular pest control costs, the service agreement, kids and pets, one-time visits, how fast we can come out, and termites."
+navKey: faq
+mainClass: faq
+permalink: /faq.html
+---
+<h1>Frequently Asked Questions</h1>
+<p class="lede" style="margin-bottom:8px">If your question isn't answered here, <a href="sms:{{ site.phone.tel }}">text us</a> at {{ site.phone.display }}.</p>
+<nav class="faq-nav" aria-label="Questions">
+  {%- for item in faq.items %}<a href="#{{ item.id }}">{{ item.nav }}</a>{% if not loop.last %} · {% endif %}{% endfor -%}
+</nav>
+<hr>
+{%- for item in faq.items %}
+<section id="{{ item.id }}">
+  <h2>{{ item.q }}</h2>
+  <p>{{ item.a | safe }}</p>
+</section>
+{%- endfor %}
+<hr>
+{%- set ctaLead = "Still curious? Call or text" %}
+{% include "cta.njk" %}

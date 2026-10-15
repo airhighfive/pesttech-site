@@ -1,0 +1,15 @@
+---
+title: Licensing + Insurance
+description: "Pest Tech is licensed and insured for pest control in Tennessee (TN Charter #4988), and does regular pest control, mosquito control, and hemlock treatments in Georgia."
+navKey: none
+permalink: /licensing-insurance.html
+---
+{#- Dan's wording, 2026-10-15. The old site's page lived at /insurance (redirected here); the charter number comes from it. #}
+<h1>Licensing + Insurance</h1>
+<p>We're appropriately licensed and insured to perform this sort of work in the state of Tennessee. We also do regular pest control, mosquito control, and hemlock treatments in the state of Georgia.</p>
+<ul>
+  {%- for l in site.licenses %}
+  <li>{{ l.name | capitalize }}: #{{ l.number }}</li>
+  {%- endfor %}
+</ul>
+<p>If you need a copy of our documents for any reason, please text us at <a href="sms:{{ site.phone.tel }}">{{ site.phone.display }}</a>.</p>

@@ -1,0 +1,23 @@
+---
+title: Pest Control Services
+fullTitle: "Pest Control Services in Chattanooga | Pest Tech"
+description: "Pest control services in Chattanooga: Regular Service, termites, mosquitoes, German cockroaches, rodents, bed bugs, and hemlock woolly adelgid."
+navKey: services
+permalink: /services.html
+---
+{%- set regular = services[0] %}
+<h1>Services</h1>
+<p class="lede">Not sure which you need? Call or text <a href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a> and tell us what you're seeing.</p>
+<div class="featured">
+  <h2><a href="/{{ regular.slug }}">{{ regular.name }} →</a></h2>
+  <p>{{ regular.blurb }}</p>
+</div>
+<dl class="service-index">
+  {%- for s in services | except(regular.slug) %}
+  <dt><a href="/{{ s.slug }}">{{ s.name }} →</a></dt>
+  <dd>{{ s.blurb }}</dd>
+  {%- endfor %}
+</dl>
+<hr>
+{%- set ctaLead = "Ready to schedule?" %}
+{% include "cta.njk" %}

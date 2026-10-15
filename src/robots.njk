@@ -1,0 +1,22 @@
+---
+permalink: /robots.txt
+layout: false
+eleventyExcludeFromCollections: true
+---
+# Everyone is welcome, AI crawlers included (spec: be quotable by LLMs).
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: {{ site.url }}/sitemap.xml

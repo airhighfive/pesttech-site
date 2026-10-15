@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if fullTitle %}{{ fullTitle }}{% else %}{{ title }} | {{ site.name }}{% endif %}</title>
+<meta name="description" content="{{ description }}">
+<link rel="canonical" href="{{ site.url }}{{ page.url | cleanUrl }}">
+{%- if noindex %}
+<meta name="robots" content="noindex">
+{%- endif %}
+<link rel="preload" href="/assets/fonts/Nexa_Bold.otf" as="font" type="font/otf" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css">
+<script type="application/ld+json">{{ schema.business | dump | safe }}</script>
+{%- if pageSchema %}
+<script type="application/ld+json">{{ pageSchema | dump | safe }}</script>
+{%- endif %}
+</head>
+<body{% if navKey == "home" %} class="home"{% endif %}>
+<div class="sheet">
+  <header class="masthead">
+    {%- set logo %}<img src="{{ site.logo.src }}" alt="{{ site.name }}" width="{{ site.logo.width }}" height="{{ site.logo.height }}">{% endset %}
+    {%- if navKey == "home" %}
+    {#- On the home page the logo is the H1: the name is already on screen, so it isn't repeated as text. #}
+    <h1>{{ logo | safe }}</h1>
+    <p class="tagline">{{ site.tagline }}</p>
+    {%- else %}
+    <a href="/">{{ logo | safe }}</a>
+    {%- endif %}
+    <hr>
+    <nav aria-label="Main">
+      <ul class="site-nav">
+        {%- for item in nav %}
+        <li>{% if item.key == navKey %}<b aria-current="page">{{ item.label }}</b>{% else %}<a href="{{ item.url }}">{{ item.label }}</a>{% endif %}</li>
+        {%- endfor %}
+      </ul>
+    </nav>
+    <hr>
+  </header>
+  <main class="{{ mainClass }}">
+{{ content | safe }}
+  </main>
+  <hr>
+  <footer class="site-footer">
+    <address>
+      {{ site.name }} · {{ site.address.street }}, {{ site.address.city }}, {{ site.address.region }} {{ site.address.postalCode }} · <a href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a> · {{ site.hours.display }}<br>
+      Mail: {{ site.mailing.street }}, {{ site.mailing.city }}, {{ site.mailing.region }} {{ site.mailing.postalCode }} · {{ site.charter }}
+    </address>
+    <a href="/terms-conditions">terms &amp; conditions</a> · <a href="/licensing-insurance">licensing &amp; insurance</a> · <a href="/weird-website">why the weird website?</a>
+  </footer>
+</div>
+</body>
+</html>

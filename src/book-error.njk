@@ -1,0 +1,14 @@
+---
+title: Request Not Sent
+description: "Your request didn't go through. Call or text (423) 771-9393."
+navKey: book
+noindex: true
+permalink: /book/error.html
+eleventyExcludeFromCollections: true
+---
+{#- The booking function (functions/api/request.js) returns this page when a request can't be sent,
+    with the reason swapped in between the two comments. Keep them. #}
+<h1>Request not sent</h1>
+<p class="lede"><!--reason-->Something went wrong on our end, and your request didn't go through.<!--/reason--></p>
+<p class="center"><a href="/book#request">← Back to the request form</a></p>
+<p class="center">Or call or text <a class="phone-inline" href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a> and we'll take it from there.</p>

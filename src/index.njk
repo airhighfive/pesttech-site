@@ -1,0 +1,32 @@
+---
+fullTitle: "Locally Owned Pest Control in Chattanooga, TN | Pest Tech"
+description: "Locally owned pest control in Chattanooga and a little bit of North Georgia. Environmentally conscious, and designed to work around kids and pets. Call or text (423) 771-9393."
+navKey: home
+permalink: /index.html
+---
+{#- The logo is this page's H1 (see base.njk), so the company name isn't repeated as text here. #}
+{%- if site.images.homeHero %}
+<figure class="hero">
+  <img src="{{ site.images.homeHero.src }}" alt="{{ site.images.homeHero.alt }}" width="{{ site.images.homeHero.width }}" height="{{ site.images.homeHero.height }}">
+</figure>
+{%- endif %}
+<p class="kicker">Serving Chattanooga, a little bit of North Georgia, and lots of <a href="/service-area">neighborhoods within 30 minutes</a>.</p>
+<p class="lede">Pest Tech does pest control that's environmentally conscious and designed to work around kids and pets. We take care of bugs in homes and businesses.</p>
+{% include "cta.njk" %}
+<hr>
+<h2>Services</h2>
+<ul class="service-list">
+  <li><a href="/regular-service">Regular Service Program</a>, seasonal maintenance that heads off bugs before they get inside</li>
+  <li><a href="/termites">Termites</a> · <a href="/skeeters">Mosquitoes</a> · <a href="/roaches">German Cockroaches</a> · <a href="/rodents">Rodents</a> · <a href="/bed-bugs">Bed Bugs</a></li>
+  <li><a href="/hemlock-woolly-adelgid">Hemlock Woolly Adelgid</a>, from a tree or two in the yard to 100-acre tracts</li>
+</ul>
+<hr>
+<h2>Neighbors say</h2>
+{%- for name in ["Jonathan D.", "Sean K."] %}
+{%- set r = reviews | reviewBy(name) %}
+<blockquote>
+  <p>“{{ r.excerpt }}”</p>
+  <footer>{{ r.name }}, {{ r.neighborhood }}</footer>
+</blockquote>
+{%- endfor %}
+<p><a href="/reviews">Read all {{ reviews.length }} reviews →</a></p>

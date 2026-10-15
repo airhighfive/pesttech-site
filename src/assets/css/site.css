@@ -1,0 +1,206 @@
+/* Pest Tech: Web 1.0 sheet on a blue dither, from the approved Claude Design handoff.
+   Colors are limited to the handoff palette: no shadows, no border-radius. */
+
+@font-face {
+  font-family: "Nexa";
+  src: url("/assets/fonts/Nexa_Bold.otf") format("opentype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --blue: #21699e;
+  --blue-dark: #164a70;
+  --ink: #434344;
+  --muted: #6e8e99;
+  --rule: #b9c4ca;
+  --tint: #f4f8fb;
+  --brand: "Nexa", Verdana, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { background: #dce7ee; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 28px 12px;
+  background: radial-gradient(#c3d4e0 1px, #dce7ee 1px) 0 0 / 6px 6px;
+  color: var(--ink);
+  font: 400 15px/1.7 Georgia, "Times New Roman", serif;
+}
+
+a { color: var(--blue); }
+a:hover { color: var(--blue-dark); }
+
+.sheet {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 34px 24px 40px;
+  background: #fff;
+  border: 1px solid var(--blue);
+}
+
+hr { border: none; border-top: 1px solid var(--rule); margin: 18px 0; }
+
+/* ── Masthead ─────────────────────────────────────────── */
+
+.masthead { text-align: center; }
+.masthead img { width: 230px; max-width: 100%; height: auto; margin-bottom: 8px; vertical-align: top; }
+.home .masthead img { width: 300px; margin-bottom: 10px; }
+.masthead hr { margin: 14px 0 12px; }
+.home .masthead hr { margin-top: 18px; }
+.masthead nav + hr { margin: 12px 0 22px; }
+.tagline { margin: 0; font-size: 14px; color: var(--muted); font-style: italic; }
+
+.site-nav { margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.8; }
+.site-nav li { display: inline; white-space: nowrap; }
+.site-nav li + li::before { content: " | "; }
+
+/* ── Type ─────────────────────────────────────────────── */
+
+h1, h2, h3 { font-family: var(--brand); font-weight: 700; line-height: 1.3; }
+h1 { font-size: 28px; margin: 0 0 10px; color: var(--blue); text-align: center; }
+/* Home: the logo is the H1, and the service-area line takes the old heading's place. */
+.masthead h1 { margin: 0; line-height: 0; }
+.kicker { font: 700 22px/1.35 var(--brand); color: var(--blue); text-align: center; margin: 0 0 12px; }
+.kicker a { color: inherit; }
+h1.left { text-align: left; margin-bottom: 12px; }
+h2 { font-size: 19px; margin: 0 0 10px; }
+.home h2 { font-size: 20px; }
+h3 { font-size: 16.5px; margin: 0 0 6px; }
+
+p { margin: 0 0 14px; line-height: 1.75; }
+.lede { text-align: center; }
+.home .lede { font-size: 16px; line-height: 1.65; }
+.small, .note { font-size: 13px; line-height: 1.6; color: var(--muted); }
+.center { text-align: center; }
+.caption { font-size: 12.5px; color: var(--muted); font-style: italic; text-align: center; }
+.crumbs { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
+.crumbs a { color: var(--muted); }
+
+ul { margin: 0 0 20px; padding-left: 24px; line-height: 1.9; }
+.service-list { line-height: 2; margin-bottom: 6px; }
+
+/* ── Figures ──────────────────────────────────────────── */
+
+figure { margin: 0 0 22px; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--ink); }
+figcaption { font-size: 12.5px; color: var(--muted); font-style: italic; text-align: center; margin-top: 7px; }
+.hero img { height: 300px; object-fit: cover; }
+.portrait-figure img { width: 280px; height: 320px; margin: 0 auto; object-fit: cover; }
+
+/* ── Calls to action ──────────────────────────────────── */
+
+.cta { text-align: center; margin: 0 0 22px; font-size: 13px; }
+.cta .phone {
+  display: inline-block;
+  font-family: var(--brand);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.4;
+  color: var(--blue);
+  text-decoration: none;
+}
+.home .cta .phone { font-size: 30px; }
+.cta .phone:hover { color: var(--blue-dark); }
+.phone-inline { font-family: var(--brand); font-weight: 700; text-decoration: none; }
+
+/* ── Quotes ───────────────────────────────────────────── */
+
+blockquote { margin: 0 0 12px; padding-left: 16px; border-left: 3px solid var(--muted); }
+blockquote p { margin: 0 0 4px; line-height: 1.6; }
+blockquote footer { font-size: 13px; color: var(--muted); }
+.reviews blockquote { margin-bottom: 20px; }
+.reviews blockquote p { font-size: 15.5px; line-height: 1.65; }
+
+/* ── Services hub ─────────────────────────────────────── */
+
+.featured { border: 1px solid var(--blue); padding: 16px 18px; margin-bottom: 24px; background: var(--tint); }
+.featured h2 a, .service-index dt a { text-decoration: none; }
+.featured p { font-size: 14.5px; line-height: 1.7; margin: 0; }
+.service-index { margin: 0 0 24px; }
+.service-index dt { font-family: var(--brand); font-weight: 700; font-size: 16.5px; margin: 0 0 4px; }
+.service-index dd { font-size: 14.5px; line-height: 1.65; margin: 0 0 18px; }
+.other-services { font-size: 13.5px; }
+
+/* Service pages: the longer explanation below the booking box. */
+.details h2 { margin-top: 22px; }
+.details > h2:first-child { margin-top: 0; }
+
+/* ── Booking ──────────────────────────────────────────── */
+
+.booking { border: 1px solid var(--blue); margin-bottom: 8px; }
+.booking-bar { background: var(--blue); color: #fff; font: 700 12px var(--brand); padding: 5px 10px; text-transform: uppercase; }
+.booking iframe, .booking-placeholder { display: block; width: 100%; height: 360px; border: 0; border-top: 1px solid var(--blue); }
+.booking.tall iframe, .booking.tall .booking-placeholder { height: 420px; }
+.booking-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  text-align: center;
+  background: repeating-linear-gradient(45deg, var(--tint), var(--tint) 10px, #eef3f7 10px, #eef3f7 20px);
+  font: 12px monospace;
+  color: var(--blue);
+}
+.booking-placeholder .small { font: 11px monospace; color: var(--muted); }
+
+.request-form { display: flex; flex-direction: column; gap: 14px; margin-bottom: 8px; }
+.request-form label { display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
+.request-form input, .request-form textarea {
+  font: inherit;
+  font-size: 15px;
+  padding: 8px 10px;
+  border: 1px solid var(--muted);
+  background: #fff;
+  color: var(--ink);
+}
+.request-form textarea { resize: vertical; }
+.request-form input[type="date"] { max-width: 220px; }
+.request-form button {
+  align-self: flex-start;
+  font: 700 16px var(--brand);
+  color: #fff;
+  background: var(--blue);
+  border: 1px solid var(--blue-dark);
+  padding: 11px 26px;
+  cursor: pointer;
+}
+.request-form button:hover, .request-form button:focus-visible { background: var(--blue-dark); }
+/* Spam honeypot: invisible to people, tempting to bots. */
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ── FAQ ──────────────────────────────────────────────── */
+
+.faq-nav { font-size: 13.5px; text-align: center; margin: 0 0 24px; line-height: 1.9; }
+.faq section { margin-bottom: 22px; }
+.faq h2 { font-size: 18px; margin-bottom: 8px; }
+.faq section p { margin: 0; }
+
+/* ── Team ─────────────────────────────────────────────── */
+
+.crew { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px 26px; margin-bottom: 10px; }
+.member { text-align: center; }
+.portrait { position: relative; width: 200px; height: 230px; margin: 0 auto 10px; border: 1px solid var(--ink); background: var(--tint); }
+.portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.portrait .silly { opacity: 0; transition: opacity 0.15s; }
+.portrait:hover .silly, .portrait:active .silly, .portrait:focus .silly { opacity: 1; }
+.portrait-empty { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 12px; color: var(--muted); font-style: italic; }
+.member-name { font: 700 16px var(--brand); color: var(--blue); }
+.member-role { font-size: 13px; color: var(--muted); }
+
+/* ── Legal pages ──────────────────────────────────────── */
+
+.legal h2 { font-size: 17px; margin-top: 24px; }
+.legal h3 { font-size: 15.5px; margin-top: 16px; }
+.legal p, .legal li { font-size: 14px; }
+
+/* ── Footer ───────────────────────────────────────────── */
+
+.site-footer { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.7; }
+.site-footer address { font-style: normal; }
+.site-footer a { color: var(--muted); }

@@ -1,0 +1,13 @@
+{#- GorillaDesk Online Booking. Shows the designed placeholder until site.booking.embedUrl is set.
+    Set `bookingBar` and `bookingTall` before including to match the /book design. #}
+<div class="booking{% if bookingTall %} tall{% endif %}">
+  <div class="booking-bar">{{ bookingBar or "Schedule online" }}</div>
+  {%- if site.booking.embedUrl %}
+  <iframe src="{{ site.booking.embedUrl }}" title="Schedule online with {{ site.name }}" loading="lazy"></iframe>
+  {%- else %}
+  <div class="booking-placeholder">
+    <span>[ GorillaDesk online-booking iframe ]</span>
+    <span class="small">real embed URL goes here once the Online Booking add-on is confirmed</span>
+  </div>
+  {%- endif %}
+</div>

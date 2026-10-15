@@ -1,0 +1,36 @@
+---
+layout: base.njk
+---
+{#- Service page template (Pest Tech Service Page.dc.html). Each page in src/services/ supplies:
+    serviceName, fullTitle, description, bookHeading, quoteFrom, and optionally quoteFull and noReferral.
+    Copy above the <!-- details --> marker is the short answer shown before the booking box. Copy below it
+    is the longer explanation shown after the booking box (voice guide: lead like a text, teach like a visit). #}
+{%- set parts = content.split("<!-- details -->") %}
+<p class="crumbs"><a href="/services">Services</a> → {{ serviceName }}</p>
+<h1 class="left">{{ serviceName }}</h1>
+{{ parts[0] | safe }}
+<hr>
+<h2>{{ bookHeading }}</h2>
+{% include "booking-embed.njk" %}
+<p class="note">Prefer a human? Call or text <a href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a>, or use the <a href="/book#request">plain request form</a>.</p>
+{%- if parts[1] %}
+<hr>
+<div class="details">
+{{ parts[1] | safe }}
+</div>
+{%- endif %}
+{%- set r = reviews | reviewBy(quoteFrom) %}
+{%- if r %}
+<hr>
+<h2>Neighbors say</h2>
+<blockquote>
+  <p>“{{ r.quote if quoteFull else r.excerpt }}”</p>
+  <footer>{{ r.name }}, {{ r.neighborhood }}</footer>
+</blockquote>
+{%- endif %}
+{%- if not noReferral %}
+<p>We're <a href="/referrals">referral-based</a>. If you send a friend or neighbor our way and they start Regular Service, your next invoice is on us. Just text us.</p>
+{%- endif %}
+<hr>
+<p class="other-services">Other services:
+{%- for s in services | except(slug) %} <a href="/{{ s.slug }}">{{ s.short }}</a>{% if not loop.last %} ·{% endif %}{% endfor %}</p>

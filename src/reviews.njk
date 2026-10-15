@@ -1,0 +1,21 @@
+---
+title: Reviews
+fullTitle: "Pest Tech Reviews from Chattanooga Neighbors"
+description: "What Chattanooga neighbors say about Pest Tech: reviews from customers in Highland Park, Brainerd, Hixson, East Ridge, St. Elmo, Lookout Mountain, and more."
+navKey: reviews
+mainClass: reviews
+permalink: /reviews.html
+---
+<h1>What the Neighbors Say</h1>
+<p class="lede" style="margin-bottom:6px">Reviews from real customers around Chattanooga, newest first.</p>
+<p class="note center" style="margin-bottom:24px">Leave us an online review and it might end up here.</p>
+<hr>
+{%- for r in reviews | newestFirst %}
+<blockquote>
+  <p>“{{ r.quote }}”</p>
+  <footer>{{ r.name }}, <b>{{ r.neighborhood }}</b> · {{ r.date | year }}</footer>
+</blockquote>
+{%- endfor %}
+<hr>
+{%- set ctaLead = "Ready to be a neighbor who says nice things?" %}
+{% include "cta.njk" %}

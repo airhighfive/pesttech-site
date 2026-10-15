@@ -1,0 +1,33 @@
+---
+title: Book a Service
+fullTitle: "Book Pest Control in Chattanooga | Pest Tech"
+description: "Book pest control in Chattanooga: call or text (423) 771-9393, pick a time online, or send a plain request form. No account, no captcha."
+navKey: book
+permalink: /book.html
+---
+<h1>Book a Service</h1>
+<p class="lede" style="margin-bottom:8px">Three ways to reach us. All of them end with a human texting you back.</p>
+<p class="center"><b>Fastest:</b> call or text <a class="phone-inline" style="font-size:18px" href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a></p>
+
+<h2>Schedule online</h2>
+{%- set bookingBar = "Pick a time online" %}
+{%- set bookingTall = true %}
+{% include "booking-embed.njk" %}
+
+<h2 id="request" style="margin-top:24px">Or send a request</h2>
+<p class="note">Plain form, no account, no captcha. We'll text you to confirm a time.</p>
+<form class="request-form" method="post" action="{{ site.booking.requestEndpoint }}">
+  <label><span><b>Name</b></span><input type="text" name="name" autocomplete="name" required></label>
+  <label><span><b>Phone</b> (we text this number)</span><input type="tel" name="phone" autocomplete="tel" required></label>
+  <label><span><b>Service address</b></span><input type="text" name="address" autocomplete="street-address" required></label>
+  <label><span><b>What's bugging you?</b></span><textarea name="issue" rows="4" placeholder="e.g. cockroaches in the kitchen, mice in the attic, a Regular Service quote" required></textarea></label>
+  <label><span><b>Preferred date</b> (optional)</span><input type="date" name="preferred_date"></label>
+  <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+  <input type="hidden" name="ts" id="ts" value="">
+  <button type="submit">Send request →</button>
+</form>
+<p class="note">This is a request, not a confirmed appointment. We'll text you to confirm. No tracking, no cookies, no newsletter.</p>
+<script>
+  // Spam time-gate: the Worker drops submissions sent less than 3 seconds after the page loaded.
+  document.getElementById("ts").value = Date.now();
+</script>

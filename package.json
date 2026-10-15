@@ -1,0 +1,16 @@
+{
+  "name": "pesttech-site",
+  "private": true,
+  "type": "module",
+  "description": "pesttechchattanooga.com: Eleventy build of the 2026 Web 1.0 redesign",
+  "scripts": {
+    "build": "eleventy",
+    "start": "eleventy --serve",
+    "images": "node scripts/optimize-images.mjs",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.6",
+    "sharp": "^0.35.5"
+  }
+}

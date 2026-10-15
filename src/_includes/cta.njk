@@ -1,0 +1,6 @@
+{#- Phone call-to-action block. Set `ctaLead` before including to change the line above the number. #}
+<div class="cta">
+  <div>{{ ctaLead or "Call or text to schedule" }}</div>
+  <a class="phone" href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a>
+  <div>or <a href="/book">book online →</a></div>
+</div>
