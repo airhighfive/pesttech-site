@@ -6,8 +6,8 @@ Everything here is either a `[Q]` from the Claude Design files (copy that wasn't
 
 - [ ] **Online Booking add-on (spec Q6).** Confirm the GorillaDesk plan includes it, then set `booking.embedUrl` in `src/_data/site.js`. Until then, /book and every service page show the designed placeholder box.
 - Done 2026-10-15: **booking endpoint (spec step 5).** `/api/request` (`functions/api/request.js`, see "Booking endpoint" in the README) is live on pages.dev, with both secrets and the `RATE_LIMIT` KV binding. Live tests posted to Slack (#new-channel) and created a GorillaDesk customer with status Lead, with its note. GorillaDesk refuses a blank ZIP, so /book has a required ZIP code box.
-  - [ ] Delete the test lead in GorillaDesk ("dan h", account #2873).
-  - Web leads arrive with no lead source (the API can't set one). A repeat customer comes in as a new lead.
+  - The test lead is deleted. GorillaDesk lead notifications are on for Dan and Shelby. The Slack link opens the lead on the web but not in the mobile app (fine).
+  - Web leads arrive with no lead source (the API can't set one). A repeat customer comes in as a new lead; delete or merge it in GorillaDesk (for a future SOP).
   - The limit is 5 requests an hour per connection, and a whole office shares one connection. To reset it while testing, delete the `ip:` entry in the `pesttech-rate-limit` KV namespace.
 - Done 2026-10-15 (Dan's answers):
   - Founded in 2015: on /about, in `site.js` (`founded`), the schema's `foundingDate`, and llms.txt.
