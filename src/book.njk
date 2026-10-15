@@ -20,6 +20,7 @@ permalink: /book.html
   <label><span><b>Name</b></span><input type="text" name="name" autocomplete="name" required></label>
   <label><span><b>Phone</b> (we text this number)</span><input type="tel" name="phone" autocomplete="tel" required></label>
   <label><span><b>Service address</b></span><input type="text" name="address" autocomplete="street-address" required></label>
+  <label><span><b>ZIP code</b></span><input type="text" name="zip" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{5}(-[0-9]{4})?" maxlength="10" title="5-digit ZIP code" required></label>
   <label><span><b>What's bugging you?</b></span><textarea name="issue" rows="4" placeholder="e.g. cockroaches in the kitchen, mice in the attic, a Regular Service quote" required></textarea></label>
   <label><span><b>Preferred date</b> (optional)</span><input type="date" name="preferred_date"></label>
   <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>

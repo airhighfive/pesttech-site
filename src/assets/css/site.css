@@ -160,7 +160,7 @@ blockquote footer { font-size: 13px; color: var(--muted); }
   color: var(--ink);
 }
 .request-form textarea { resize: vertical; }
-.request-form input[type="date"] { max-width: 220px; }
+.request-form input[type="date"], .request-form input[name="zip"] { max-width: 220px; }
 .request-form button {
   align-self: flex-start;
   font: 700 16px var(--brand);

@@ -73,7 +73,8 @@ afterEach(() => {
 const VALID = {
   name: "Jane Q Doe",
   phone: "(423) 555-0123",
-  address: "123 Main St, Hixson, TN 37343",
+  address: "123 Main St, Hixson",
+  zip: "37343",
   issue: "Roaches in the kitchen.\nSaw a few in the bathroom too.",
   preferred_date: "2026-10-21",
   website: "",
@@ -119,18 +120,60 @@ test("a good request creates a GorillaDesk lead, posts to Slack and redirects to
   assert.match(note, /^Request from the website form \(pesttechchattanooga\.com\/book\):\nRoaches in the kitchen\.\nSaw a few/);
   assert.match(note, /Preferred date: Wed, Oct 21, 2026/);
   assert.match(note, /Phone: \(423\) 555-0123/);
-  assert.match(note, /Address as typed: 123 Main St, Hixson, TN 37343/);
+  assert.match(note, /Address as typed: 123 Main St, Hixson\nZIP: 37343/);
 
   const [slack] = slackCalls();
   assert.equal(slack.json.text, [
     "New request from pesttechchattanooga.com/book",
     "*Jane Q Doe* · (423) 555-0123",
-    "123 Main St, Hixson, TN 37343",
+    "123 Main St, Hixson, 37343",
     "> Roaches in the kitchen.",
     "> Saw a few in the bathroom too.",
     "Preferred date: Wed, Oct 21, 2026",
     `<${PROFILE}|Open the lead in GorillaDesk>`,
   ].join("\n"));
+});
+
+// ---- ZIP code ----
+
+const createdLocation = () => calls.find((c) => c.method === "POST" && c.url === `${GD}/customers`).json.location;
+
+test("the ZIP box goes to GorillaDesk, and the state comes from it", async () => {
+  assert.ok(accepted(await post({ address: "9 Elm Dr, Rossville", zip: "30741" })));
+  assert.deepEqual(createdLocation(), { address_line_1: "9 Elm Dr", city: "Rossville", state: "GA", zip: "30741" });
+  assert.match(slackCalls()[0].json.text, /\n9 Elm Dr, Rossville, 30741\n/);
+});
+
+test("ZIP+4 is trimmed to the 5-digit ZIP", async () => {
+  assert.ok(accepted(await post({ zip: "37343-1234" })));
+  assert.equal(createdLocation().zip, "37343");
+});
+
+test("the ZIP box wins over a different ZIP typed in the address", async () => {
+  assert.ok(accepted(await post({ address: "123 Main St, Hixson, TN 37415", zip: "37343" })));
+  assert.deepEqual(createdLocation(), { address_line_1: "123 Main St", city: "Hixson", state: "TN", zip: "37343" });
+});
+
+test("no ZIP box but a ZIP in the address (an agent posting directly) is fine", async () => {
+  assert.ok(accepted(await post({ zip: undefined, address: "123 Main St, Hixson, TN 37343, USA" })));
+  assert.equal(createdLocation().zip, "37343");
+  assert.match(slackCalls()[0].json.text, /\n123 Main St, Hixson, TN 37343, USA\n/);
+});
+
+test("no ZIP anywhere: the error page asks for it, and nothing is sent", async () => {
+  const res = await post({ zip: "", address: "123 Main St" });
+  assert.equal(res.status, 400);
+  assert.match(await res.text(), /Please fill in your ZIP code, then send it again\./);
+  assert.equal(calls.length, 0);
+});
+
+test("a ZIP that isn't 5 digits gets the error page", async () => {
+  for (const zip of ["3734", "37343-12", "ABCDE"]) {
+    const res = await post({ zip });
+    assert.equal(res.status, 400, zip);
+    assert.match(await res.text(), /ZIP code doesn&#39;t look right/);
+  }
+  assert.equal(calls.length, 0);
 });
 
 test("the optional date can be left out", async () => {

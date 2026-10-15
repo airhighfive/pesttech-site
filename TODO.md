@@ -5,10 +5,9 @@ Everything here is either a `[Q]` from the Claude Design files (copy that wasn't
 ## Blocking launch
 
 - [ ] **Online Booking add-on (spec Q6).** Confirm the GorillaDesk plan includes it, then set `booking.embedUrl` in `src/_data/site.js`. Until then, /book and every service page show the designed placeholder box.
-- [ ] **Connect the booking endpoint (spec step 5).** `/api/request` is built as a Pages Function (`functions/api/request.js`, see "Booking endpoint" in the README). It passed tests against mocks and in `wrangler pages dev`, but it hasn't talked to the real GorillaDesk or Slack yet. To finish:
-  - In the Pages project, add the secrets `GORILLADESK_API_KEY` and `SLACK_WEBHOOK_URL`, and bind a KV namespace as `RATE_LIMIT`.
-  - Send one real test request. Check the lead, its note and the Slack message, then delete the test lead.
-  - Include an address with no ZIP. GorillaDesk's API lists ZIP as required, and browsers autofill only the street into the form's single address box. If GorillaDesk refuses it, Slack says so and someone adds the lead by hand. A "Street, city, ZIP" placeholder on that box would help.
+- [ ] **Finish the booking endpoint test (spec step 5).** `/api/request` (`functions/api/request.js`, see "Booking endpoint" in the README) is live on pages.dev. The Pages project has both secrets and the `RATE_LIMIT` KV binding (2026-10-15).
+  - Done: a live test posted to Slack (#new-channel). The first GorillaDesk test was refused because the ZIP was blank, so /book now has a required ZIP code box (Dan, 2026-10-15).
+  - To do: send one more test with the ZIP box filled in. Check the lead, its note and the Slack link, then delete the test lead in GorillaDesk.
   - Expect web leads to arrive with no lead source (the API can't set one). A repeat customer comes in as a new lead.
 - Done 2026-10-15 (Dan's answers):
   - Founded in 2015: on /about, in `site.js` (`founded`), the schema's `foundingDate`, and llms.txt.
@@ -86,6 +85,6 @@ The archive is in `../squarespace-archive-2026-10-15/` (open its `index.html`).
 
 ## Launch (spec sequence 6–8)
 
-- [ ] Private GitHub repo, then a Cloudflare Pages project: build command `npm run build`, output `_site`, `NODE_VERSION=22`.
+- Done 2026-10-15: private repo `airhighfive/pesttech-site` and the Cloudflare Pages project `pesttech-site`. Every push to `main` deploys to https://pesttech-site.pages.dev. If an extra *Worker* named `pesttech-site` is still in Workers & Pages (made by mistake before the Pages project), delete it.
 - [ ] Dan reviews the pages.dev preview end to end. `_headers` keeps pages.dev out of search results.
 - [ ] DNS flip with SPF/DKIM/DMARC intact. Verify redirects and GBP links. Keep Squarespace paid until the 301s show up in Search Console.

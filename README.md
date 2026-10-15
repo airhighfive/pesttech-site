@@ -54,6 +54,8 @@ npm test           # booking endpoint tests (GorillaDesk and Slack are mocked)
 
 ## Deploy (Cloudflare Pages)
 
+The private repo is `airhighfive/pesttech-site`. Every push to `main` builds and deploys the Pages project `pesttech-site` to https://pesttech-site.pages.dev, so a change isn't live until it's committed and pushed.
+
 - Build command: `npm run build`
 - Output directory: `_site`
 - Environment variable: `NODE_VERSION=22`

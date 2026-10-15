@@ -21,7 +21,7 @@ const MIN_FILL_MS = 3_000;
 const RATE_MAX = 5; // accepted requests per IP...
 const RATE_WINDOW_S = 60 * 60; // ...per hour
 const MAX_BODY_BYTES = 16 * 1024;
-const MAX_LENGTH = { name: 100, phone: 40, address: 200, issue: 2_000, preferred_date: 40 };
+const MAX_LENGTH = { name: 100, phone: 40, address: 200, zip: 10, issue: 2_000, preferred_date: 40 };
 const GORILLADESK_API = "https://api.gorilladesk.com/v1";
 const GORILLADESK_TIMEOUT_MS = 8_000;
 const SLACK_TIMEOUT_MS = 5_000;
@@ -69,12 +69,16 @@ async function handleRequest(context) {
   }
 
   const req = Object.fromEntries(Object.keys(MAX_LENGTH).map((name) => [name, field(name)]));
+  // GorillaDesk won't take a lead without a ZIP. It comes from the form's ZIP box, or for agents posting directly,
+  // from inside the address.
+  const zipGiven = req.zip || parseAddress(req.address).zip;
   const missing = [
     ["name", "your name"],
     ["phone", "a phone number"],
     ["address", "the service address"],
+    ["zip", "your ZIP code"],
     ["issue", "what's bugging you"],
-  ].filter(([name]) => !req[name]);
+  ].filter(([name]) => !(name === "zip" ? zipGiven : req[name]));
   if (missing.length) {
     return errorPage(context, 400, `Please fill in ${listify(missing.map(([, label]) => label))}, then send it again.`);
   }
@@ -93,6 +97,10 @@ async function handleRequest(context) {
     console.log("booking: refused, phone didn't parse");
     return errorPage(context, 400, "We couldn't read that phone number. Please use a 10-digit US number, like 423-555-0123.");
   }
+  const zip = req.zip ? /^(\d{5})(?:-?\d{4})?$/.exec(req.zip)?.[1] : zipGiven;
+  if (!zip) {
+    return errorPage(context, 400, "That ZIP code doesn't look right. Please use the 5-digit ZIP, like 37407.");
+  }
 
   if (!env.GORILLADESK_API_KEY && !env.SLACK_WEBHOOK_URL) {
     console.error("booking: GORILLADESK_API_KEY and SLACK_WEBHOOK_URL are both unset, so the request has nowhere to go");
@@ -108,7 +116,7 @@ async function handleRequest(context) {
     });
   }
 
-  const lead = { ...req, phone, host: new URL(request.url).host };
+  const lead = { ...req, zip, phone, host: new URL(request.url).host };
   const delivery = deliver(env, lead);
   // Without this, a closed tab or a second click could cancel the request halfway (a lead with no Slack message).
   context.waitUntil?.(delivery);
@@ -164,7 +172,7 @@ async function createLead(env, lead) {
       ...(last && { last_name: last }),
       status: "lead",
       ...(phoneType && { phones: [{ phone: lead.phone.dashed, type: phoneType }] }),
-      location: parseAddress(lead.address),
+      location: parseAddress(lead.address, lead.zip),
     },
   });
   const id = created?.data?.id;
@@ -258,7 +266,7 @@ function slackText(lead, gd) {
   const lines = [
     `New request from ${lead.host}/book`,
     `*${slackEscape(lead.name)}* · ${lead.phone.display}`,
-    slackEscape(lead.address),
+    slackEscape(lead.address.includes(lead.zip) ? lead.address : `${lead.address}, ${lead.zip}`),
     ...lead.issue.split("\n").map((line) => `> ${slackEscape(line)}`),
   ];
   if (lead.preferred_date) lines.push(`Preferred date: ${slackEscape(describeDate(lead.preferred_date))}`);
@@ -279,6 +287,7 @@ function noteText(lead) {
     `Preferred date: ${lead.preferred_date ? describeDate(lead.preferred_date) : "none given"}`,
     `Phone: ${lead.phone.display}`,
     `Address as typed: ${lead.address}`,
+    `ZIP: ${lead.zip}`,
   ].join("\n");
 }
 
@@ -359,10 +368,11 @@ const STATES = { tn: "TN", tenn: "TN", tennessee: "TN", ga: "GA", georgia: "GA",
 const GEORGIA_TOWNS = /^(?:rossville|fort oglethorpe|ft\.? oglethorpe|ringgold|chickamauga|flintstone|la ?fayette|trenton|rising fawn)$/i;
 const UNIT = /^(?:apt|apartment|unit|ste|suite|lot|bldg|building|fl|floor|rm|room|#)\b/i;
 
-// The form has one address box; GorillaDesk wants street, city, state and ZIP. Best effort: take the last 5-digit
-// number as the ZIP, peel a state off the end, take the last comma-separated part as the city, and fall back to
-// Chattanooga, TN. The address as typed also goes in the note, so nothing is lost when this guesses wrong.
-export function parseAddress(raw) {
+// GorillaDesk wants street, city, state and ZIP; the form has an address box and a ZIP box. Best effort: take the last
+// 5-digit number as the ZIP (the ZIP box wins), peel a state off the end, take the last comma-separated part as the
+// city, and fall back to Chattanooga, with the state from the ZIP. The address as typed also goes in the note, so
+// nothing is lost when this guesses wrong.
+export function parseAddress(raw, zipBox = "") {
   // Addresses pasted from a map often end with the country or a period.
   const trailing = /[\s,.;]+$/;
   let rest = raw.replace(/[\s,]*\b(?:usa|u\.s\.(?:a\.)?|us|united states(?: of america)?)\W*$/i, "").replace(trailing, "");
@@ -375,6 +385,7 @@ export function parseAddress(raw) {
     zip = zipMatch[1];
     rest = (rest.slice(0, zipMatch.index) + rest.slice(zipMatch.index + zipMatch[0].length)).replace(trailing, "");
   }
+  zip = zipBox || zip;
   const stateMatch = /[\s,]+(tn|tenn|tennessee|ga|georgia|al|ala|alabama)\.?$/i.exec(rest);
   if (stateMatch) {
     state = STATES[stateMatch[1].toLowerCase()];
