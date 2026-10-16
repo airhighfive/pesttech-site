@@ -1,35 +1,36 @@
-// Builds the background river: the Tennessee River through Chattanooga, Moccasin Bend and all,
-// drawn in the page's background color so it shows up as a gap in the dot dither (see site.css).
+// Builds the background river: the Tennessee River through Chattanooga, drawn a shade lighter than the page
+// background so it shows up as a pale band with no dots in the dot dither (see site.css).
 //
-// Data: USGS National Hydrography Dataset (public domain), "Area - Large Scale" layer. The river through
-// town is stored as StreamRiver polygons (ftype 460); the script keeps every one that reaches into the
-// map area (a few creek mouths come along with them). To refresh it, download the GeoJSON from
+// Data: USGS National Hydrography Dataset (public domain). Through town the river is a StreamRiver polygon
+// (ftype 460) in the "Area - Large Scale" layer (9). Below town it becomes Nickajack Lake, and above
+// Chickamauga Dam it's Chickamauga Lake, both in the "Waterbody - Large Scale" layer (12). To refresh it,
+// download both layers as GeoJSON for the same box:
 //   https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/9/query
 //   ?where=1=1&geometry=-85.42,34.98,-85.18,35.13&geometryType=esriGeometryEnvelope
 //   &inSR=4326&outSR=4326&returnGeometry=true&outFields=*&f=geojson
-// then run: node scripts/make-river-svg.mjs <that file.geojson>
+// (the same with /12/ for the lakes), then run:
+//   node scripts/make-river-svg.mjs <area.geojson> <waterbody.geojson>
 //
-// Output: two pieces that share one scale and one north/south window, so the river lines up:
-//   river-west.svg  Moccasin Bend and the west half of downtown, pinned to the left edge of the screen
-//   river-east.svg  downtown up to Chickamauga Dam, pinned to the right edge
-// The centered page covers the middle, so each side of a wide screen shows a recognizable stretch,
-// whatever the screen's shape. Each piece fades out along its inner edge, so neither ends in a hard line.
+// The map has one fixed scale, so a wider window shows more of the river instead of a bigger one. Williams
+// Island lands just left of the page, and at this zoom downtown sits right behind the middle of it. It's cut
+// in two at the middle, river-west.svg (Williams Island, Moccasin Bend, the gorge) and river-east.svg (up to
+// the dam and the lake). Both are the same size, so site.css lays them over each other and fades them in turn.
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const input = process.argv[2];
-if (!input) throw new Error("Usage: node scripts/make-river-svg.mjs <nhd-area.geojson>");
+const [areaFile, waterbodyFile, outDir = path.join(root, "src/assets/img")] = process.argv.slice(2);
+if (!waterbodyFile) throw new Error("Usage: node scripts/make-river-svg.mjs <area.geojson> <waterbody.geojson>");
 
-const LAT = { min: 35.016, max: 35.108 }; // from just below the I-24 bridge to Chickamauga Dam
-const H = 1080;
-const ky = H / (LAT.max - LAT.min);
-const kx = ky * Math.cos((((LAT.min + LAT.max) / 2) * Math.PI) / 180);
-const PIECES = [
-  { file: "river-west.svg", lonMin: -85.352, lonMax: -85.293, fade: "right", label: "Moccasin Bend and downtown" },
-  { file: "river-east.svg", lonMin: -85.3, lonMax: -85.226, fade: "left", label: "downtown up to Chickamauga Dam" },
-];
+const PX_PER_KM = 130;
+const PAGE_HALF = 320; // the page is 640px wide, centered
+const GAP = 16; // between Williams Island's east bank and the page
+const MID_LAT = 35.08; // the latitude at the middle of the window
+const FILL = "#e4ecf1"; // a shade lighter than the page background, #dce7ee
+const W = 3000, H = 1500; // big enough for a 2560 x 1440 window; past that the river fades out
+const ky = PX_PER_KM * 110.95; // px per degree of latitude
+const kx = PX_PER_KM * 111.32 * Math.cos((MID_LAT * Math.PI) / 180);
 
 // Sutherland-Hodgman clip of one ring against an axis-aligned rectangle.
 function clipRing(ring, box) {
@@ -93,45 +94,64 @@ function simplifyRing(pts, tol) {
   return simplify(pts.slice(0, far + 1), tol).concat(simplify(pts.slice(far), tol).slice(1));
 }
 
-// Collect the river polygons. USGS splits the river through town into more than one StreamRiver
-// polygon (ftype 460), so keep every one that actually reaches into the map area.
-const geo = JSON.parse(readFileSync(input, "utf8"));
 const polygonsOf = (g) => (g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : []);
-const lonMin = Math.min(...PIECES.map((p) => p.lonMin)), lonMax = Math.max(...PIECES.map((p) => p.lonMax));
-const inArea = ([lon, lat]) => lon > lonMin && lon < lonMax && lat > LAT.min && lat < LAT.max;
-const rings = [];
-for (const f of geo.features) {
-  if (Number(f.properties.ftype ?? f.properties.FTYPE) !== 460) continue;
-  const polyRings = polygonsOf(f.geometry).flat();
-  const count = polyRings.reduce((n, ring) => n + ring.filter(inArea).length, 0);
-  if (count >= 5) rings.push(...polyRings);
-}
-if (!rings.length) throw new Error("No StreamRiver polygons found in the map area");
+const km2 = (ring) => {
+  let s = 0;
+  for (let i = 0; i < ring.length - 1; i++) s += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+  return (Math.abs(s / 2) * kx * ky) / PX_PER_KM ** 2;
+};
+const ftype = (f) => Number(f.properties.ftype ?? f.properties.FTYPE);
 
-const pad = 40; // clip a little outside the picture so cut edges never show
+// The river through town is the biggest StreamRiver polygon (the smaller ones are creeks). The lakes are the
+// two big reservoirs in the waterbody layer, Nickajack below town and Chickamauga above the dam.
+const river = JSON.parse(readFileSync(areaFile, "utf8")).features
+  .filter((f) => ftype(f) === 460)
+  .flatMap((f) => polygonsOf(f.geometry))
+  .sort((a, b) => km2(b[0]) - km2(a[0]))[0];
+const lakes = JSON.parse(readFileSync(waterbodyFile, "utf8")).features
+  .flatMap((f) => polygonsOf(f.geometry))
+  .filter((poly) => km2(poly[0]) > 5);
+if (!river || lakes.length < 2) throw new Error("Couldn't find the river and both lakes in the data");
+
+// Williams Island is the river's biggest island. Find the east bank of the channel beside it.
+const island = river.slice(1).sort((a, b) => km2(b) - km2(a))[0];
+const [iMinLat, iMaxLat] = [Math.min(...island.map((p) => p[1])), Math.max(...island.map((p) => p[1]))];
+const iMaxLon = Math.max(...island.map((p) => p[0]));
+const eastBank = Math.max(...river[0].filter(([lon, lat]) => lat > iMinLat && lat < iMaxLat && lon > iMaxLon && lon < iMaxLon + 0.01).map((p) => p[0]));
+
+// Screen position relative to the middle of the window; SVG position adds W/2, H/2.
+const x0 = W / 2 - PAGE_HALF - GAP - eastBank * kx;
+const project = ([lon, lat]) => [x0 + lon * kx, H / 2 - (lat - MID_LAT) * ky];
+for (const [name, ll] of Object.entries({ "Williams Island": [iMaxLon, (iMinLat + iMaxLat) / 2], downtown: [-85.3097, 35.0456], "Chickamauga Dam": [-85.2293, 35.1033] })) {
+  const [x, y] = project(ll);
+  console.log(`${name}: ${Math.round(x - W / 2)}px across, ${Math.round(y - H / 2)}px down from the middle of the window`);
+}
+
+const rings = [river, ...lakes].flat().map((ring) => ring.map(project));
+const pad = 20; // clip a little outside the picture so cut edges never show
+const PIECES = [
+  { file: "river-west.svg", box: { x0: -pad, x1: W / 2, y0: -pad, y1: H + pad }, label: "Williams Island, Moccasin Bend and the gorge" },
+  { file: "river-east.svg", box: { x0: W / 2, x1: W + pad, y0: -pad, y1: H + pad }, label: "up to Chickamauga Dam and the lake" },
+];
 for (const piece of PIECES) {
-  const W = Math.round((piece.lonMax - piece.lonMin) * kx);
-  const project = ([lon, lat]) => [(lon - piece.lonMin) * kx, (LAT.max - lat) * ky];
-  const box = { x0: -pad, x1: W + pad, y0: -pad, y1: H + pad };
   const parts = [];
   let points = 0;
   for (const ring of rings) {
-    const clipped = simplifyRing(clipRing(ring.map(project), box), 1.4);
+    const clipped = simplifyRing(clipRing(ring, piece.box), 1.2);
     if (clipped.length < 3) continue;
     points += clipped.length;
     parts.push("M" + clipped.map(([x, y]) => `${Math.round(x)} ${Math.round(y)}`).join("L") + "Z");
   }
-  // Fade the inner edge (the side that runs under the page) instead of ending in a hard line.
-  const stops = piece.fade === "right"
-    ? `<stop offset=".8" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>`
-    : `<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".2" stop-color="#fff"/>`;
+  // Fade the outer edges, so a window bigger than the map doesn't end in a hard line.
+  const stops = `<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff"/>` +
+    `<stop offset=".94" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>`;
   const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">` +
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
     `<!-- Tennessee River through Chattanooga (${piece.label}), from the USGS National Hydrography Dataset. ` +
-    `Made by scripts/make-river-svg.mjs; filled with the page background color so it reads as a gap in the dots. -->` +
-    `<defs><linearGradient id="g">${stops}</linearGradient>` +
-    `<mask id="m"><rect width="${W}" height="${H}" fill="url(#g)"/></mask></defs>` +
-    `<path mask="url(#m)" fill="#dce7ee" fill-rule="evenodd" stroke="#dce7ee" stroke-width="7" stroke-opacity=".5" stroke-linejoin="round" d="${parts.join("")}"/></svg>\n`;
-  writeFileSync(path.join(root, "src/assets/img", piece.file), svg);
+    `Made by scripts/make-river-svg.mjs; it covers the dots, so it reads as a pale band in them. -->` +
+    `<defs><linearGradient id="h">${stops}</linearGradient><linearGradient id="v" x2="0" y2="1">${stops}</linearGradient>` +
+    `<mask id="mh"><rect width="${W}" height="${H}" fill="url(#h)"/></mask><mask id="mv"><rect width="${W}" height="${H}" fill="url(#v)"/></mask></defs>` +
+    `<g mask="url(#mv)"><path mask="url(#mh)" fill="${FILL}" fill-rule="evenodd" d="${parts.join("")}"/></g></svg>\n`;
+  writeFileSync(path.join(outDir, piece.file), svg);
   console.log(`${piece.file}: ${W}x${H}, ${points} points, ${Math.round(svg.length / 1024)} KB`);
 }
