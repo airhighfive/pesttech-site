@@ -11,8 +11,13 @@ layout: base.njk
 {{ parts[0] | safe }}
 <hr>
 <h2>{{ bookHeading }}</h2>
+{%- if bookingNote %}
+{#- A page can swap the online booking box for a short note (bed bugs: deposit, text to schedule). #}
+<p>{{ bookingNote | safe }}</p>
+{%- else %}
 {% include "booking-embed.njk" %}
 <p class="note">Prefer a human? Call or text <a href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a>, or use the <a href="/book#request">plain request form</a>.</p>
+{%- endif %}
 {%- if parts[1] %}
 <hr>
 <div class="details">

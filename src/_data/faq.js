@@ -6,7 +6,7 @@ const items = [
     id: "cost",
     nav: "Cost",
     q: "What does regular pest control cost?",
-    a: "For most homes in our servicea area, a Regular Service Program runs <b>$40 to $60 a month</b>. That covers scheduled seasonal treatments, plus any extra visits needed in between at no charge. Larger homes or special situations may differ. We'll visit and take a look before we start work.",
+    a: "For most homes in our service area, a Regular Service Program runs <b>$40 to $60 a month</b>. That covers scheduled seasonal treatments, plus any extra visits needed in between at no charge. Larger homes or special situations may differ. We'll visit and take a look before we start work.",
   },
   {
     // Dan, 2026-10-15: fine to say "quarterly" here, since it's what people search for.

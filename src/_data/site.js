@@ -56,6 +56,12 @@ export default {
 
   images: {
     homeHero: null, // { src, alt, width, height }
-    about: null,
+    // The photo from the old Squarespace About page (Dan, 2026-10-16). Made by `npm run images` from ../photos.
+    about: {
+      src: "/assets/img/about-dan.webp",
+      alt: "A younger Dan, smiling by a white work truck, with a hound looking out the window",
+      width: 720,
+      height: 720,
+    },
   },
 };

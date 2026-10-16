@@ -16,8 +16,8 @@ export default [
   },
   {
     slug: "skeeters",
-    name: "Mosquitoes",
-    short: "Mosquitoes",
+    name: "Mosquitos",
+    short: "Mosquitos",
     blurb: "Conventional barrier treatments, plus alternative mosquito control for difficult or sensitive situations.",
   },
   {

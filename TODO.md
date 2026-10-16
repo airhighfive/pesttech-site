@@ -41,7 +41,8 @@ Answered by Dan on 2026-10-15 and now on the site:
 
 - Regular Service: 100-day commitment confirmed. A start-up charge is mentioned only as a maybe ("depending on the house"), with no amount.
 - Termites: one-year commitment; as an add-on to Regular Service, typically $25 to $35 a month after a $500 to $1,000 setup (matches the handbook's Pricing Guidelines).
-- Mosquitoes: $100 to $120 a month published.
+- Mosquitos: $100 to $150 a month published. Regular Service is $40 to $60 a month everywhere (Dan raised both ranges 2026-10-16).
+- Dan's calls, 2026-10-16: spell it "mosquitos" everywhere in our copy (reviews stay verbatim), and the "!" on /service-area stays (an approved exception to the voice guide).
 - Kids and pets: "about an hour" inside after an outside treatment, on /regular-service and the FAQ.
 - Bed bugs: the page is aimed at single-family, owner-occupied homes. The 90-day warranty is for single-family detached homes only, not apartments or one side of a duplex. Apartments only for existing property-manager customers.
 
@@ -49,7 +50,7 @@ Still open:
 
 - Hemlock (Dan, 2026-10-15): headings keep "Corrective"; the body pairs the two terms, "curative (corrective)" and "corrective (curative)", since people search both.
 - About: drafted 2026-10-15 in third person, like the old page (voice guide Q19). Founding year 2015 confirmed.
-- [ ] About photo: the caption "Dan was pretty young when we started all this" shows once `images.about` is set, so an early photo of Dan fits best.
+- Done 2026-10-16: About photo (Dan with the truck and hound, from the old site), the summer 2026 rafting photo on /team, the $200 bed bug deposit note in place of the booking box on /bed-bugs, and swooping background lines on wide screens (`src/assets/img/swooshes.svg`). Photo originals are in `../photos`.
 - [ ] Home page line "A constant pursuit of technical knowledge, a deep love for our city..." isn't used anywhere yet (voice guide Q20). Keep it somewhere?
 
 - **Everywhere:** never "quarterly" (say seasonal); "cockroaches," not "roaches," in copy (the /roaches URL stays for search); no "the one most people choose" style lines.
@@ -65,7 +66,7 @@ Still open:
 ## Photos
 
 - Team photos: done 2026-10-15 from Dan's contact-sheet mapping. Names use the Employee Directory spellings (Donavon, Candace). Dan to double-check the page.
-- [ ] **Home hero and About photo.** Set `images.homeHero` / `images.about` in `site.js`. Both figures stay hidden until set.
+- [ ] **Home hero (optional).** Set `images.homeHero` in `site.js`; the figure stays hidden until set.
 - [ ] **30-minute service-area map** (handoff: Dan is producing it). Replace `design/uploads/Service Area Simple.jpg` and run `npm run images`.
 - [ ] Favicon.
 - Not used on purpose: `design/uploads/pasted-1789440901681-0.png` is a GorillaDesk map of customer locations. Don't publish it.

@@ -37,8 +37,23 @@ await write(
   path.join(img, "service-area-map-vignette.webp"),
 );
 
-// Crew and holiday photos aren't assigned to anyone yet, so each gets a full-width copy
-// (for the home hero or About) and a 400×460 portrait crop (for a Team frame).
+// Photos Dan sent directly (2026-10-16). Originals live in ../photos, outside the repo.
+const extra = path.resolve(root, "../photos");
+// About page: an early photo of Dan with the truck and the hound, shown square at 360px.
+await write(
+  sharp(path.join(extra, "dan-and-truck.jpg")).rotate().resize(720, 720, { fit: "cover" }).webp({ quality: 80 }),
+  path.join(img, "about-dan.webp"),
+);
+// Team page: the summer 2026 rafting trip. The original (1129x1500) is mostly trees up top,
+// so this keeps a band of scenery above the helmets and stops below the feet.
+await write(
+  sharp(path.join(extra, "crew-rafting-2026.jpg")).rotate().extract({ left: 0, top: 420, width: 1129, height: 1000 })
+    .resize({ width: 1000 }).webp({ quality: 72 }),
+  path.join(img, "team-rafting.webp"),
+);
+
+// Crew and holiday photos: each gets a full-width copy (for a possible home hero) and a
+// 400×460 portrait crop for its Team frame (assigned in src/_data/team.js).
 const photos = (await readdir(uploads)).filter((f) => /\.jpe?g$/i.test(f) && !/^Service Area/i.test(f));
 for (const file of photos) {
   const base = path.parse(file).name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
