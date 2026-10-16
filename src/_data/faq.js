@@ -6,14 +6,14 @@ const items = [
     id: "cost",
     nav: "Cost",
     q: "What does regular pest control cost?",
-    a: "Our Regular Service Program runs <b>$40 to $50 a month</b> for most homes in our service area. That covers scheduled seasonal treatments plus any extra visits needed in between at no charge. Larger homes or special situations may differ. We'll visit and take a look before we start work.",
+    a: "For most homes in our servicea area, a Regular Service Program runs <b>$40 to $60 a month</b>. That covers scheduled seasonal treatments, plus any extra visits needed in between at no charge. Larger homes or special situations may differ. We'll visit and take a look before we start work.",
   },
   {
     // Dan, 2026-10-15: fine to say "quarterly" here, since it's what people search for.
     id: "quarterly",
     nav: "Quarterly service",
     q: "Is Regular Service the same as quarterly pest control?",
-    a: 'Pretty close. It works out to about four visits a year, but we time them to the seasons instead of the calendar, and what we do changes with whatever\'s active. Problems between visits are included. More on the <a href="/regular-service">Regular Service page</a>.',
+    a: 'Pretty close. It works out to about four visits a year, but we time them to the seasons instead of the calendar. Our applications change a bit throughout the year, rather than the exact same procedure each visit. Problems between visits are included if they pop up. More on the <a href="/regular-service">Regular Service page</a>.',
   },
   {
     id: "contracts",
@@ -25,14 +25,14 @@ const items = [
     // Rewritten per the voice guide's hard rule 2: no safety claims about treatments.
     id: "pets",
     nav: "Kids and pets",
-    q: "Do I need to do anything about my kids and pets?",
+    q: "Do I need to worry about my kids and pets?",
     a: "For most services, no. Friendly or contained pets aren't a problem. We apply every product according to its label, and after an outside treatment we'll ask you to keep kids and pets inside for about an hour so it can dry. Bed bug and flea treatments can be exceptions; you'll get specific instructions for those.",
   },
   {
     id: "onetime",
     nav: "One-time visits",
     q: "Do you do one-time services?",
-    a: "Yes, for specific problems like a wasp nest, a roach flare-up, or a mouse in the pantry. Most folks who start with a one-time visit end up on the Regular Service Program because it's cheaper than fighting fires, but there's no pressure.",
+    a: "Yes, for specific problems like a wasp nest, a roach flare-up, or a mouse in the pantry. Most folks who start with a one-time visit end up on the Regular Service Program because it's cheaper than fighting fires, but it's not required.",
   },
   {
     id: "speed",
