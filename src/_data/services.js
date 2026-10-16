@@ -6,7 +6,7 @@ export default [
     slug: "regular-service",
     name: "Regular Service Program",
     short: "Regular Service",
-    blurb: "Seasonal maintenance focused on the outside of the house, to head off ants, wasps, and cockroaches before they get inside. Most homes pay $40 to $50 a month, and extra visits between treatments are included.",
+    blurb: "Seasonal maintenance focused on the outside of the house, to head off ants, wasps, and cockroaches before they get inside. Most homes pay $40 to $60 a month, and extra visits between treatments are included.",
   },
   {
     slug: "termites",
