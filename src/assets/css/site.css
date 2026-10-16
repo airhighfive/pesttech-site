@@ -33,34 +33,46 @@ body {
 
 /* The Tennessee River through town on wider screens, a pale band with no dots. The map has a fixed scale,
    centered on the page, so a wider window shows more river: Williams Island just left of the page, downtown
-   behind it, and the run up to Chickamauga Dam on the right. The two halves brighten in turn, upstream
-   first, so the river seems to flow. Only opacity changes, which the browser hands to the graphics card;
-   no JavaScript. The shapes come from USGS map data via scripts/make-river-svg.mjs. */
+   behind it, and the run up to Chickamauga Dam on the right. The shapes come from USGS map data via
+   scripts/make-river-svg.mjs.
+   The river is scattered with small white points. Over it drifts a sheet in the river's own color with soft
+   holes in it (body::after). Its "darken" blend keeps the darker of two colors, so it leaves the dots and the
+   river as they are and covers only the white points, except where a hole passes over one. Each point lights
+   up in turn, like sun on the water. Only the sheet's position changes, which the browser hands to the
+   graphics card; no JavaScript. */
 @media (min-width: 900px) {
   body { position: relative; z-index: 0; }
   body::before,
   body::after {
     content: "";
     position: fixed;
-    inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: no-repeat 50% 50% / 3000px 1500px;
-    opacity: 0.7;
-    will-change: opacity;
-    animation: river-flow 40s ease-in-out infinite;
   }
-  body::before { background-image: url("/assets/img/river-east.svg"); }
-  body::after { background-image: url("/assets/img/river-west.svg"); animation-delay: 6s; }
+  body::before {
+    inset: 0;
+    background: url("/assets/img/river.svg") no-repeat 50% 50% / 3000px 1500px;
+    opacity: 0.85;
+  }
+  /* The sheet reaches one tile (240 x 180) past the window on the right and top, so it covers the window for
+     the whole pass, and each pass ends exactly where the next begins. */
+  body::after {
+    top: -180px;
+    right: -240px;
+    bottom: 0;
+    left: 0;
+    background: url("/assets/img/river-sparkle.svg") 0 0 / 240px 180px;
+    mix-blend-mode: darken;
+    will-change: transform;
+    animation: river-sparkle 15s linear infinite;
+  }
 }
-@keyframes river-flow {
-  0%, 45%, 100% { opacity: 0.7; }
-  15%, 30% { opacity: 1; }
+@keyframes river-sparkle {
+  to { transform: translate(-240px, 180px); }
 }
-/* For anyone whose device asks for less motion: the river stays put. */
+/* For anyone whose device asks for less motion: the river stays put, and so does the light on it. */
 @media (min-width: 900px) and (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after { animation: none; opacity: 0.85; }
+  body::after { animation: none; }
 }
 
 a { color: var(--blue); }

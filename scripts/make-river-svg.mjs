@@ -1,5 +1,5 @@
-// Builds the background river: the Tennessee River through Chattanooga, drawn a shade lighter than the page
-// background so it shows up as a pale band with no dots in the dot dither (see site.css).
+// Builds the background river: the Tennessee River through Chattanooga, a pale band in the page's dot dither
+// with points of light in it that twinkle, like sun on the water (see site.css).
 //
 // Data: USGS National Hydrography Dataset (public domain). Through town the river is a StreamRiver polygon
 // (ftype 460) in the "Area - Large Scale" layer (9). Below town it becomes Nickajack Lake, and above
@@ -12,9 +12,12 @@
 //   node scripts/make-river-svg.mjs <area.geojson> <waterbody.geojson>
 //
 // The map has one fixed scale, so a wider window shows more of the river instead of a bigger one. Williams
-// Island lands just left of the page, and at this zoom downtown sits right behind the middle of it. It's cut
-// in two at the middle, river-west.svg (Williams Island, Moccasin Bend, the gorge) and river-east.svg (up to
-// the dam and the lake). Both are the same size, so site.css lays them over each other and fades them in turn.
+// Island lands just left of the page, and at this zoom downtown sits right behind the middle of it.
+//
+// Output:
+//   river.svg          the river, a shade lighter than the page background, scattered with small white points
+//   river-sparkle.svg  a tile in the river's color with soft holes in it. site.css drifts it over the river, and
+//                      it hides the points except where a hole passes over one, so each point twinkles in turn.
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -29,6 +32,9 @@ const GAP = 16; // between Williams Island's east bank and the page
 const MID_LAT = 35.08; // the latitude at the middle of the window
 const FILL = "#e4ecf1"; // a shade lighter than the page background, #dce7ee
 const W = 3000, H = 1500; // big enough for a 2560 x 1440 window; past that the river fades out
+// Points of light sit on a 6px grid like the page's dots, in a tile that repeats along the river.
+const POINTS = { w: 96, h: 72, count: 48, r: 1.6 };
+const HOLES = { w: 240, h: 180, count: 56, rMin: 7, rMax: 11 }; // the sparkle tile; site.css uses the same size
 const ky = PX_PER_KM * 110.95; // px per degree of latitude
 const kx = PX_PER_KM * 111.32 * Math.cos((MID_LAT * Math.PI) / 180);
 
@@ -94,6 +100,18 @@ function simplifyRing(pts, tol) {
   return simplify(pts.slice(0, far + 1), tol).concat(simplify(pts.slice(far), tol).slice(1));
 }
 
+// A small seeded random number generator (mulberry32), so the points and holes land in the same places every run.
+function seeded(seed) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const random = seeded(4237719393);
+const n1 = (v) => +v.toFixed(1);
+
 const polygonsOf = (g) => (g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : []);
 const km2 = (ring) => {
   let s = 0;
@@ -127,31 +145,58 @@ for (const [name, ll] of Object.entries({ "Williams Island": [iMaxLon, (iMinLat 
   console.log(`${name}: ${Math.round(x - W / 2)}px across, ${Math.round(y - H / 2)}px down from the middle of the window`);
 }
 
-const rings = [river, ...lakes].flat().map((ring) => ring.map(project));
 const pad = 20; // clip a little outside the picture so cut edges never show
-const PIECES = [
-  { file: "river-west.svg", box: { x0: -pad, x1: W / 2, y0: -pad, y1: H + pad }, label: "Williams Island, Moccasin Bend and the gorge" },
-  { file: "river-east.svg", box: { x0: W / 2, x1: W + pad, y0: -pad, y1: H + pad }, label: "up to Chickamauga Dam and the lake" },
-];
-for (const piece of PIECES) {
-  const parts = [];
-  let points = 0;
-  for (const ring of rings) {
-    const clipped = simplifyRing(clipRing(ring, piece.box), 1.2);
-    if (clipped.length < 3) continue;
-    points += clipped.length;
-    parts.push("M" + clipped.map(([x, y]) => `${Math.round(x)} ${Math.round(y)}`).join("L") + "Z");
-  }
-  // Fade the outer edges, so a window bigger than the map doesn't end in a hard line.
-  const stops = `<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff"/>` +
-    `<stop offset=".94" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>`;
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
-    `<!-- Tennessee River through Chattanooga (${piece.label}), from the USGS National Hydrography Dataset. ` +
-    `Made by scripts/make-river-svg.mjs; it covers the dots, so it reads as a pale band in them. -->` +
-    `<defs><linearGradient id="h">${stops}</linearGradient><linearGradient id="v" x2="0" y2="1">${stops}</linearGradient>` +
-    `<mask id="mh"><rect width="${W}" height="${H}" fill="url(#h)"/></mask><mask id="mv"><rect width="${W}" height="${H}" fill="url(#v)"/></mask></defs>` +
-    `<g mask="url(#mv)"><path mask="url(#mh)" fill="${FILL}" fill-rule="evenodd" d="${parts.join("")}"/></g></svg>\n`;
-  writeFileSync(path.join(outDir, piece.file), svg);
-  console.log(`${piece.file}: ${W}x${H}, ${points} points, ${Math.round(svg.length / 1024)} KB`);
+const box = { x0: -pad, x1: W + pad, y0: -pad, y1: H + pad };
+const parts = [];
+let points = 0;
+for (const ring of [river, ...lakes].flat()) {
+  const clipped = simplifyRing(clipRing(ring.map(project), box), 1.2);
+  if (clipped.length < 3) continue;
+  points += clipped.length;
+  parts.push("M" + clipped.map(([x, y]) => `${Math.round(x)} ${Math.round(y)}`).join("L") + "Z");
 }
+
+// The river is filled with a pattern: its color, plus white points on a random pick of the tile's grid spots.
+const spots = [];
+for (let x = 3; x < POINTS.w; x += 6) for (let y = 3; y < POINTS.h; y += 6) spots.push([x, y]);
+let dots = "";
+for (let i = 0; i < POINTS.count; i++) {
+  const [x, y] = spots.splice(Math.floor(random() * spots.length), 1)[0];
+  dots += `<circle cx="${x}" cy="${y}" r="${POINTS.r}"/>`;
+}
+// Fade the outer edges, so a window bigger than the map doesn't end in a hard line.
+const stops = `<stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff"/>` +
+  `<stop offset=".94" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>`;
+const riverSvg =
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+  `<!-- Tennessee River through Chattanooga, from the USGS National Hydrography Dataset. Made by ` +
+  `scripts/make-river-svg.mjs; it covers the dots, so it reads as a pale band in them. -->` +
+  `<defs><linearGradient id="h">${stops}</linearGradient><linearGradient id="v" x2="0" y2="1">${stops}</linearGradient>` +
+  `<mask id="mh"><rect width="${W}" height="${H}" fill="url(#h)"/></mask><mask id="mv"><rect width="${W}" height="${H}" fill="url(#v)"/></mask>` +
+  `<pattern id="p" width="${POINTS.w}" height="${POINTS.h}" patternUnits="userSpaceOnUse">` +
+  `<rect width="${POINTS.w}" height="${POINTS.h}" fill="${FILL}"/><g fill="#fff">${dots}</g></pattern></defs>` +
+  `<g mask="url(#mv)"><path mask="url(#mh)" fill="url(#p)" fill-rule="evenodd" d="${parts.join("")}"/></g></svg>\n`;
+writeFileSync(path.join(outDir, "river.svg"), riverSvg);
+console.log(`river.svg: ${W}x${H}, ${points} points, ${Math.round(riverSvg.length / 1024)} KB`);
+
+// The sparkle tile: the river's color with soft holes. A hole that crosses an edge is drawn again on the
+// far side, so the tile repeats without seams.
+let holes = "";
+for (let i = 0; i < HOLES.count; i++) {
+  const x = random() * HOLES.w, y = random() * HOLES.h, r = HOLES.rMin + random() * (HOLES.rMax - HOLES.rMin);
+  for (const dx of [-HOLES.w, 0, HOLES.w]) {
+    for (const dy of [-HOLES.h, 0, HOLES.h]) {
+      if (x + dx + r < 0 || x + dx - r > HOLES.w || y + dy + r < 0 || y + dy - r > HOLES.h) continue;
+      holes += `<circle cx="${n1(x + dx)}" cy="${n1(y + dy)}" r="${n1(r)}"/>`;
+    }
+  }
+}
+const sparkleSvg =
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${HOLES.w}" height="${HOLES.h}" viewBox="0 0 ${HOLES.w} ${HOLES.h}">` +
+  `<!-- The river's color with soft holes, drifted over the river by site.css so its points of light twinkle. ` +
+  `Made by scripts/make-river-svg.mjs. -->` +
+  `<defs><radialGradient id="g"><stop offset=".55"/><stop offset="1" stop-opacity="0"/></radialGradient>` +
+  `<mask id="m"><rect width="${HOLES.w}" height="${HOLES.h}" fill="#fff"/><g fill="url(#g)">${holes}</g></mask></defs>` +
+  `<rect width="${HOLES.w}" height="${HOLES.h}" fill="${FILL}" mask="url(#m)"/></svg>\n`;
+writeFileSync(path.join(outDir, "river-sparkle.svg"), sparkleSvg);
+console.log(`river-sparkle.svg: ${HOLES.w}x${HOLES.h}, ${HOLES.count} holes, ${sparkleSvg.length} bytes`);
