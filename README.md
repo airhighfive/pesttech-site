@@ -40,7 +40,8 @@ npm test           # booking endpoint tests (GorillaDesk and Slack are mocked)
 - **Redirects.** `src/_redirects` sends the 26 old testimonial pages to /reviews, /calendar to home, and the old /insurance page to /licensing-insurance. Every other URL is unchanged.
 - **Schema.** Every page carries LocalBusiness JSON-LD (`src/_data/schema.js`). Service pages add a Service block, and /faq adds FAQPage, built from the same list the page shows. schema.org has no PestControl type, so the business uses HomeAndConstructionBusiness.
 - **Crawlers.** The site generates `sitemap.xml`, `robots.txt` (AI crawlers welcome) and `llms.txt`.
-- **Images.** The originals in `../design/uploads` run up to 16 MB and stay out of the repo. `npm run images` writes web copies to `src/assets/img/`, and those get committed.
+- **Images.** The originals in `../design/uploads` and `../photos` stay out of the repo. `npm run images` writes web copies to `src/assets/img/`, and those get committed.
+- **Background river.** On screens 900px and wider, the Tennessee River (Moccasin Bend on the left, the run to Chickamauga Dam on the right) shows as a gap in the dots and fades slowly downstream. `scripts/make-river-svg.mjs` builds `river-west.svg` and `river-east.svg` from USGS hydrography data (public domain); the animation is in `site.css`.
 - **Booking.** The /book form posts to `/api/request` (see below). A successful request lands on `/book/thanks`.
 
 ## Booking endpoint

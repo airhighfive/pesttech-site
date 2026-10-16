@@ -31,18 +31,36 @@ body {
   font: 400 15px/1.7 Georgia, "Times New Roman", serif;
 }
 
-/* Swooping lines across the dither on wider screens, so a big monitor isn't a flat field of dots.
-   One small SVG on a fixed layer behind the sheet: no JavaScript, no motion. */
+/* The Tennessee River through town, drawn as a gap in the dots on wider screens: Moccasin Bend in the
+   left margin, the run up toward Chickamauga Dam in the right. The two halves fade in turn, upstream
+   first, so the river seems to flow. Only opacity changes, which the browser hands to the graphics card;
+   no JavaScript. The shapes come from USGS map data via scripts/make-river-svg.mjs. */
 @media (min-width: 900px) {
   body { position: relative; z-index: 0; }
-  body::before {
+  body::before,
+  body::after {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: url("/assets/img/swooshes.svg") center / cover no-repeat;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    opacity: 0.35;
+    will-change: opacity;
+    animation: river-flow 40s ease-in-out infinite;
   }
+  body::before { background-image: url("/assets/img/river-east.svg"); background-position: right center; }
+  body::after { background-image: url("/assets/img/river-west.svg"); background-position: left center; animation-delay: 6s; }
+}
+@keyframes river-flow {
+  0%, 45%, 100% { opacity: 0.35; }
+  15%, 30% { opacity: 1; }
+}
+/* For anyone whose device asks for less motion: the river stays put. */
+@media (min-width: 900px) and (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after { animation: none; opacity: 0.7; }
 }
 
 a { color: var(--blue); }
