@@ -64,7 +64,7 @@ body {
     background: url("/assets/img/river-sparkle.svg") 0 0 / 240px 180px;
     mix-blend-mode: darken;
     will-change: transform;
-    animation: river-sparkle 15s linear infinite;
+    animation: river-sparkle 21s linear infinite;
   }
 }
 @keyframes river-sparkle {
