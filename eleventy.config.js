@@ -1,6 +1,8 @@
 export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
   eleventyConfig.addPassthroughCopy({ "src/_redirects": "_redirects", "src/_headers": "_headers" });
+  // Favicons sit at the site root, where browsers and phones look for them (made by `npm run images`).
+  eleventyConfig.addPassthroughCopy({ "src/favicon.ico": "favicon.ico", "src/icon-192.png": "icon-192.png", "src/apple-touch-icon.png": "apple-touch-icon.png" });
 
   // Pages are written as /name.html, which Cloudflare Pages serves at /name. That keeps
   // every Squarespace URL exactly as it was (no trailing slash, no redirect hop).

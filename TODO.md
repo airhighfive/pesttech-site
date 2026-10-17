@@ -68,7 +68,7 @@ Still open:
 - Team photos: done 2026-10-15 from Dan's contact-sheet mapping. Names use the Employee Directory spellings (Donavon, Candace). Dan to double-check the page.
 - [ ] **Home hero (optional).** Set `images.homeHero` in `site.js`; the figure stays hidden until set.
 - [ ] **30-minute service-area map** (handoff: Dan is producing it). Replace `design/uploads/Service Area Simple.jpg` and run `npm run images`.
-- [ ] Favicon.
+- Done 2026-10-17: Favicon, the bug from the logo. `npm run images` makes `favicon.ico` (16, 32, 48px), `icon-192.png` and `apple-touch-icon.png` in `src/`.
 - Not used on purpose: `design/uploads/pasted-1789440901681-0.png` is a GorillaDesk map of customer locations. Don't publish it.
 
 ## Reviews
@@ -82,12 +82,13 @@ The archive is in `../squarespace-archive-2026-10-15/` (open its `index.html`).
 
 - Done: `/home`, `/blog`, and `/blog/*` now 301 to `/`. The 2020 tick post is retired (Dan, 2026-10-15); it's still in the archive.
 - Done: `/referrals` is a small page (no form), since the postcards mailed to new customers point there. The referral line on the service pages links to it.
-- [ ] Save what a crawl can't see (details in the archive's README): Squarespace's export, URL mappings, code injection, any stored form submissions, and a screenshot of every row in Namecheap's Advanced DNS.
-- [ ] DNS is hosted at Namecheap, and email is Namecheap Private Email. Cloudflare Pages needs the domain's nameservers on Cloudflare to serve the bare pesttechchattanooga.com, so going live means moving nameservers and recreating the email records exactly (MX, SPF, DKIM, autodiscover, DMARC; all in the archive's `dns-records.txt`).
-- [ ] There are two DMARC records, which mail servers treat as none. Merge them into one (wording in `dns-records.txt`).
+- Done (Dan, 2026-10-17): saved what a crawl can't see (Squarespace's export, URL mappings, code injection, form submissions) and a screenshot of every row in Namecheap's Advanced DNS.
+- Done 2026-10-17: the nameservers moved from Namecheap to Cloudflare (jasper and shubhi.ns.cloudflare.com; the first save in Namecheap didn't reach the registry and had to be redone). Email stays on Namecheap Private Email; its records were recreated in Cloudflare as DNS only and checked against `dns-records.txt`. The Shopify email records, Squarespace's verify CNAME and MailerLite's `litesrv._domainkey` were left behind on purpose.
+- Done 2026-10-17: the two DMARC records are merged into one.
 
 ## Launch (spec sequence 6–8)
 
 - Done 2026-10-15: private repo `airhighfive/pesttech-site` and the Cloudflare Pages project `pesttech-site`. Every push to `main` deploys to https://pesttech-site.pages.dev. If an extra *Worker* named `pesttech-site` is still in Workers & Pages (made by mistake before the Pages project), delete it.
-- [ ] Dan reviews the pages.dev preview end to end. `_headers` keeps pages.dev out of search results.
-- [ ] DNS flip with SPF/DKIM/DMARC intact. Verify redirects and GBP links. Keep Squarespace paid until the 301s show up in Search Console.
+- Done 2026-10-17: live on pesttechchattanooga.com. Pages serves the bare domain, www and http 301 to `https://pesttechchattanooga.com/`, every rule in `_redirects` answers with the right 301, and the email records are intact. `_headers` still keeps pages.dev out of search results.
+- [ ] Search Console: submit `https://pesttechchattanooga.com/sitemap.xml`. Keep Squarespace paid until the 301s show up there, and leave Namecheap's old Advanced DNS records alone until then.
+- [ ] Check the Google Business Profile's website link.
